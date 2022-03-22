@@ -12,10 +12,11 @@ const ErrorMessage = styled.div`
 const Signup = () => {
   const [id, onChangeId] = useInput('');
   const [nickname, onChangeNickname] = useInput('');
-
   const [password, onChangePassword] = useInput('');
+
   const [passwordCheck, setPasswordCheck] = useState('');
   const [passwordError, setPasswordError] = useState(false);
+
   const onChangePasswordCheck = useCallback(
     e => {
       setPasswordCheck(e.target.value);

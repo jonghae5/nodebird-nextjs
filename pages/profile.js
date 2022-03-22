@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import { Button } from 'antd';
+import {} from 'antd';
 
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
