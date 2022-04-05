@@ -1,20 +1,31 @@
 import { Button, Form, Input } from 'antd';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import useInput from '../hooks/useInput';
 import PropTypes from 'prop-types';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { ADD_COMMENT_REQUEST } from '../reducers/post';
 const CommentForm = ({ post }) => {
+  const dispatch = useDispatch();
+  const { addCommentDone, addCommentLoading } = useSelector(
+    state => state.post
+  );
   const id = useSelector(state => state.user.me?.id);
+  const [commentText, onChangeCommentText, setCommentText] = useInput('');
 
-  const [commentText, onChangeCommentText] = useInput('');
+  useEffect(() => {
+    if (addCommentDone) {
+      setCommentText('');
+    }
+  }, [addCommentDone]);
 
   const onSubmitComment = useCallback(() => {
-    console.log(commentText);
-  }, [commentText]);
+    dispatch({
+      type: ADD_COMMENT_REQUEST,
+      data: { content: commentText, userId: id, postId: post.id },
+    });
+  }, [commentText, id]);
 
-  const hello = useCallback(() => console.log('hello'));
   return (
     <Form onFinish={onSubmitComment}>
       <Form.Item style={{ position: 'relative', margin: 0 }}>
@@ -26,9 +37,10 @@ const CommentForm = ({ post }) => {
         <Button
           type='primary'
           htmlType='submit'
+          loading={addCommentLoading}
           style={{ position: 'absolute', right: 0, bottom: -40, zIndex: 1 }}
         >
-          짹짹
+          업로드
         </Button>
       </Form.Item>
     </Form>

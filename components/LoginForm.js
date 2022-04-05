@@ -3,23 +3,25 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 import { Button, Form, Input } from 'antd';
 import Link from 'next/link';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../hooks/useInput';
-import { loginAction } from '../reducers/user';
+import { LOG_IN_REQUEST } from '../reducers/user';
+
 /* CSS 적듯이 표현 */
 
 // const ButtonWrapper = styled.div`
 //   margintop: 10px;
 // `;
 
-const FormWrapper = styled(Form)`
-  padding: 10px;
-`;
+// const FormWrapper = styled(Form)`
+//   padding: 10px;
+// `;
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const [id, onChangeId] = useInput('');
+  const { logInLoading } = useSelector(state => state.user);
+  const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
 
   const style = useMemo(() => {
@@ -27,20 +29,28 @@ const LoginForm = () => {
   }, []);
 
   const onSubmitForm = useCallback(() => {
-    dispatch(
-      loginAction({
-        id,
+    console.log(email, password);
+    dispatch({
+      type: LOG_IN_REQUEST,
+      data: {
+        email,
         password,
-      })
-    );
-  }, [id, password]);
+      },
+    });
+  }, [email, password]);
 
   return (
     <Form onFinish={onSubmitForm} style={{ padding: '10px' }}>
       <div>
-        <label htmlFor='user-id'>아이디</label>
+        <label htmlFor='user-email'>이메일</label>
         <br />
-        <Input name='user-id' value={id} onChange={onChangeId} required />
+        <Input
+          name='user-email'
+          value={email}
+          type='email'
+          onChange={onChangeEmail}
+          required
+        />
       </div>
       <div>
         <label htmlFor='user-password'>비밀번호</label>
@@ -54,7 +64,7 @@ const LoginForm = () => {
         />
       </div>
       <div style={{ marginTop: '10px' }}>
-        <Button type='primary' htmlType='submit' loading={false}>
+        <Button type='primary' htmlType='submit' loading={logInLoading}>
           로그인
         </Button>
         <Link href='/signup'>
@@ -67,7 +77,4 @@ const LoginForm = () => {
   );
 };
 
-LoginForm.propTypes = {
-  setIsLoggedIn: PropTypes.func.isRequired,
-};
 export default LoginForm;
