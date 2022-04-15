@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Button, Form, Input } from 'antd';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,14 +20,19 @@ import { LOG_IN_REQUEST } from '../reducers/user';
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const { logInLoading } = useSelector(state => state.user);
+  const { logInLoading, logInError } = useSelector(state => state.user);
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
 
-  const style = useMemo(() => {
-    marginTop: 10;
-  }, []);
+  // const style = useMemo(() => {
+  //   marginTop: 10;
+  // }, []);
 
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
   const onSubmitForm = useCallback(() => {
     console.log(email, password);
     dispatch({
