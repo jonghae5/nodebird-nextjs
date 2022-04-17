@@ -25,7 +25,8 @@ const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
   const [liked, setLiked] = useState(false);
   const { removePostLoading } = useSelector(state => state.post);
-  const id = useSelector(state => state.user.me && state.user.me.id);
+  // const id = useSelector(state => state.user.me && state.user.me.id);
+  const id = useSelector(state => state.user.me?.id);
 
   const onToggleLike = useCallback(() => {
     setLiked(prev => !prev);
@@ -115,7 +116,7 @@ PostCard.propTypes = {
     id: PropTypes.number,
     User: PropTypes.object,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
