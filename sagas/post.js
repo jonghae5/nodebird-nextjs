@@ -27,8 +27,78 @@ import {
   REMOVE_POST_FAILURE,
   REMOVE_POST_REQUEST,
   REMOVE_POST_SUCCESS,
+  LIKE_POST_FAILURE,
+  LIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
+  UNLIKE_POST_REQUEST,
+  UNLIKE_POST_SUCCESS,
+  UPLOAD_IMAGES_REQUEST,
+  UPLOAD_IMAGES_SUCCESS,
+  UPLOAD_IMAGES_FAILURE,
 } from '../reducers/post';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from '../reducers/user';
+
+function uploadImagesAPI(data) {
+  return axios.post(`/post/images`, data, { withCredentials: true });
+}
+
+function* uploadImages(action) {
+  try {
+    const result = yield call(uploadImagesAPI, action.data);
+    yield put({
+      type: UPLOAD_IMAGES_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UPLOAD_IMAGES_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function likePostAPI(data) {
+  // 사실 data 필요없음 주소자체에 데이터 보유
+  return axios.patch(`/post/${data}/like`, { withCredentials: true });
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function unlikePostAPI(data) {
+  return axios.delete(`/post/${data}/like`, { withCredentials: true });
+}
+
+function* unlikePost(action) {
+  try {
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function loadPostsAPI(data) {
   return axios.get('/posts', data);
@@ -52,8 +122,8 @@ function* loadPosts(action) {
 }
 
 function addPostAPI(data) {
-  return axios.post('/post', { content: data }, { withCredentials: true });
-  // return axios.post('/post', data, { withCredentials: true });
+  // return axios.post('/post', { content: data }, { withCredentials: true });
+  return axios.post('/post', data, { withCredentials: true });
 }
 
 function* addPost(action) {
@@ -79,20 +149,21 @@ function* addPost(action) {
 }
 
 function removePostAPI(data) {
-  return axios.delete('/post', data, { withCredentials: true });
+  // DELETE는 Data 못넣음
+  return axios.delete(`/post/${data.postId}`);
 }
 
 function* removePost(action) {
   try {
-    // const result = yield call(removePostAPI, action.data);
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
+    // yield delay(1000);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     console.error(err);
@@ -142,11 +213,25 @@ function* watchAddComment() {
   yield takeLatest(ADD_COMMENT_REQUEST, addComment);
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnlikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
+}
+
+function* watchUploadImages() {
+  yield takeLatest(UPLOAD_IMAGES_REQUEST, uploadImages);
+}
 export default function* postSaga() {
   yield all([
     fork(watchAddPost),
     fork(watchLoadPosts),
     fork(watchRemovePost),
     fork(watchAddComment),
+    fork(watchLikePost),
+    fork(watchUnlikePost),
+    fork(watchUploadImages),
   ]);
 }
