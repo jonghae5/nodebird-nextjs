@@ -31,6 +31,9 @@ import {
   LOAD_USER_FAILURE,
   LOAD_USER_REQUEST,
   LOAD_USER_SUCCESS,
+  LOAD_MY_INFO_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_SUCCESS,
   CHANGE_NICKNAME_REQUEST,
   CHANGE_NICKNAME_SUCCESS,
   CHANGE_NICKNAME_FAILURE,
@@ -140,6 +143,7 @@ function* unfollow(action) {
     const result = yield call(unfollowAPI, action.data);
     // yield delay(1000);
     yield put({
+      type: UNFOLLOW_SUCCESS,
       data: result.data,
     });
   } catch (err) {
@@ -174,9 +178,9 @@ function* removeFollower(action) {
   }
 }
 
-function loadUserAPI() {
+function loadUserAPI(data) {
   // Cookie 는 data로 보내는 것 생략
-  return axios.get('/user', {
+  return axios.get(`/user/${data}`, {
     withCredentials: true,
   });
 }
@@ -192,6 +196,29 @@ function* loadUser(action) {
     console.error(err);
     yield put({
       type: LOAD_USER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadMyInfoAPI() {
+  // Cookie 는 data로 보내는 것 생략
+  return axios.get('/user', {
+    withCredentials: true,
+  });
+}
+
+function* loadMyInfo(action) {
+  try {
+    const result = yield call(loadMyInfoAPI, action.data);
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
       error: err.response.data,
     });
   }
@@ -288,6 +315,10 @@ function* watchSignUp() {
 function* watchLoadUser() {
   yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
+
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
 function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
@@ -307,6 +338,7 @@ export default function* userSaga() {
     fork(watchLogOut),
     fork(watchSignUp),
     fork(watchLoadUser),
+    fork(watchLoadMyInfo),
     fork(watchChangeNickname),
     fork(watchLoadFollowings),
     fork(watchLoadFollowers),
