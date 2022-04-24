@@ -1,3 +1,54 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:313eeef19d6a8d80b014e0da9729647963c2ebad859a055c99abf6bde5cf5542
-size 1481
+import { Button, Form, Input } from 'antd';
+import React, { useCallback, useEffect } from 'react';
+import useInput from '../hooks/useInput';
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { ADD_COMMENT_REQUEST } from '../reducers/post';
+const CommentForm = ({ post }) => {
+  const dispatch = useDispatch();
+  const { addCommentDone, addCommentLoading } = useSelector(
+    state => state.post
+  );
+  const id = useSelector(state => state.user.me?.id);
+  const [commentText, onChangeCommentText, setCommentText] = useInput('');
+
+  useEffect(() => {
+    if (addCommentDone) {
+      setCommentText('');
+    }
+  }, [addCommentDone]);
+
+  const onSubmitComment = useCallback(() => {
+    dispatch({
+      type: ADD_COMMENT_REQUEST,
+      data: { content: commentText, userId: id, postId: post.id },
+    });
+  }, [commentText, id]);
+
+  return (
+    <Form onFinish={onSubmitComment}>
+      <Form.Item style={{ position: 'relative', margin: 0 }}>
+        <Input.TextArea
+          rows={4}
+          value={commentText}
+          onChange={onChangeCommentText}
+        />
+        <Button
+          type='primary'
+          htmlType='submit'
+          loading={addCommentLoading}
+          style={{ position: 'absolute', right: 0, bottom: -40, zIndex: 1 }}
+        >
+          업로드
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+CommentForm.propTypes = {
+  post: PropTypes.object.isRequired,
+};
+
+export default CommentForm;

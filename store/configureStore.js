@@ -1,3 +1,37 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:05979019fa308132947dad2157db1f2e7ea07f6176e91945288f0ee83f7c7c08
-size 1109
+import React from 'react';
+
+import { createWrapper } from 'next-redux-wrapper';
+import { applyMiddleware, compose, createStore } from 'redux';
+import reducer from '../reducers';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import createSagaMiddleware from 'redux-saga';
+import rootSaga from '../sagas';
+
+// const loggerMiddleware =
+//   ({ dispatch, getState }) =>
+//   next =>
+//   action => {
+//     console.log(action);
+//     return next(action);
+//   };
+
+const configureStore = () => {
+  const sagaMiddleware = createSagaMiddleware();
+  const middlewares = [sagaMiddleware];
+  const enhancer =
+    process.env.NODE_ENV === 'production'
+      ? compose(applyMiddleware(...middlewares))
+      : composeWithDevTools(applyMiddleware(...middlewares));
+  const store = createStore(reducer, enhancer);
+  store.sagaTask = sagaMiddleware.run(rootSaga);
+  //   store.dispatch({
+  //     type: 'CHANGE_NICKNAME',
+  //     data: 'boogicho',
+  //   });
+  return store;
+};
+
+const wrapper = createWrapper(configureStore, {
+  debug: process.env.NODE_ENV === 'development',
+});
+export default wrapper;

@@ -1,3 +1,27 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:dd928c345d6f6b22111bf7db15f3e5a55fe367d723080ead169ff559882e0202
-size 617
+import React from 'react';
+import Link from 'next/link';
+import PropTypes from 'prop-types';
+
+const PostCardContent = ({ postData }) => (
+  <div>
+    {postData.split(/(#[^\s#]+)/g).map((v, idx) => {
+      if (v.match(/(#[^\s]+)/)) {
+        return (
+          <Link
+            href={{ pathname: '/hashtag', query: { tag: v.slice(1) } }}
+            as={`/hashtag/${v.slice(1)}`}
+            key={idx}
+          >
+            <a>{v}</a>
+          </Link>
+        );
+      }
+      return v;
+    })}
+  </div>
+);
+PostCardContent.propTypes = {
+  postData: PropTypes.string.isRequired,
+};
+
+export default PostCardContent;
