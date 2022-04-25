@@ -1,3 +1,13 @@
+import AppLayout from '../components/AppLayout';
+
+export default function Profile() {
+  return (
+    <>
+      <h1>404 Error - Page Not Found</h1>
+    </>
+  );
+}
+
 // import React from 'react';
 // import { useSelector } from 'react-redux';
 // import Head from 'next/head';
