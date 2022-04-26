@@ -184,7 +184,7 @@ const reducer = (state = initialState, action) =>
       case UPLOAD_IMAGES_SUCCESS:
         draft.uploadImagesLoading = false;
         draft.uploadImagesDone = true;
-        draft.imagePaths = action.data;
+        draft.imagePaths = draft.imagePaths.concat(action.data); // 여러 이미지를 저장할 수 있도록 한다.
         break;
       case UPLOAD_IMAGES_FAILURE:
         draft.uploadImagesLoading = false;
