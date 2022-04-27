@@ -1,1 +1,1 @@
-export const backUrl = 'http://api.jonghae5.shop';
+export const backUrl = 'https://api.jonghae5.shop';
